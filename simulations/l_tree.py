@@ -10,15 +10,19 @@ from pygame.math import Vector2
 
 lines = []
 colours = []
+
 # F = forward + = rotate positive - = rotate negative [ = save branch ] = load branch
 rule = ("F", "FF+[+F-F-F]-[-F+F+F]")
-saved_lines = []  # Line, rotation and depth
+
+
+# Line, rotation and depth
+saved_lines = []  
 leaf_nodes = set()
 
 
 def initialize_game():
     pygame.init()
-    screen = pygame.display.set_mode((600, 600))
+    screen = pygame.display.set_mode((669, 600))
     pygame.display.set_caption("L-tree simulation")
     return screen
 
@@ -27,7 +31,7 @@ def game_loop(screen):
     running = True
 
     while running:
-        # Check for exit button
+        # Check for exit 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -42,11 +46,13 @@ def game_loop(screen):
         wind_factor = math.sin(pygame.time.get_ticks() / 420)
         wind_force = 69
 
-        # Draw all lines
+        # Draw tree lines
         leaf_index = 0
         for depth in range(0, len(lines)):
             for line in range(0, len(lines[depth])):
-                # Add wind
+                
+
+                #let it blow
                 start_position = copy.copy(lines[depth][line][0])
                 wind_multiplier = (600 - start_position[1]) / 600
                 start_position += Vector2(1, 0) * \
@@ -56,6 +62,7 @@ def game_loop(screen):
                 wind_multiplier = (600 - end_position[1]) / 600
                 end_position += Vector2(1, 0) * \
                     wind_multiplier * wind_force * wind_factor
+
 
                 # Draw the wooden parts
                 pygame.draw.line(screen, (143, 79, 30),
@@ -88,6 +95,7 @@ def generate_string(recursion_depth, string):
     if recursion_depth == 3:
         return string
 
+
     new_string = ""
     for char in string:
         if char == rule[0]:
@@ -115,35 +123,32 @@ def add_lines(generation_string):
                 line = (last_line[1], last_line[1] +
                         direction * length)
 
-                # All branches of the recursion should add to the correct depth
+                
+                #append to the correct spot 
                 if len(lines) > branch_depth:
                     lines[branch_depth].append(line)
                 else:
                     lines.append([line])
 
-                # Detect leaf nodes
-                if step < len(generation_string) - 1 and generation_string[step + 1] == "]":
-                    leaf_nodes.add(
-                        (branch_depth, len(lines[branch_depth]) - 1))
-
-                    colour = Color(0, 0, 0)
-                    colour.hsva = (136, 70, random.randint(40, 80))
-                    colours.append(colour)
 
                 last_line = line
                 current_angle = 0
                 branch_depth += 1
+            
             case "+":
-                current_angle += random.randint(25, 35)
+                current_angle += random.randint(24, 36)
+            
             case "-":
-                current_angle += random.randint(-35, -25)
+                current_angle += random.randint(-36, -24)
+            
             case "[":
-                # Save branch
+                # Save 
                 global saved_lines
                 saved_lines.append(
                     (last_line, current_angle, branch_depth))
+            
             case "]":
-                # Load branch
+                # Load 
                 saved_line = saved_lines.pop()
                 last_line = saved_line[0]
                 current_angle = 0
